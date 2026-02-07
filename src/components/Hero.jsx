@@ -16,6 +16,11 @@ function Hero() {
   const totalVideos = 4;
   const nextVideoRef = useRef(null);
 
+  useEffect(() => {
+    if (loadedVideos === totalVideos - 1) {
+      setIsLoading(false);
+    }
+  }, [loadedVideos])
   const handleVideoLoad = () => {
     setLoadedVideos((prev) => prev + 1);
   };
@@ -24,7 +29,6 @@ function Hero() {
 
   const handleMiniVidClick = () => {
     setHasClicked(true);
-    setCurrentIndex(upcomingVideoIndex);
   };
 
   useEffect(() => {
@@ -50,6 +54,10 @@ function Hero() {
           duration: 1,
           ease: "power1.inOut",
           onStart: () => nextVideoRef.current.play(),
+          // onComplete: () => {
+          //   setCurrentIndex(upcomingVideoIndex);
+          //   setHasClicked(false);
+          // },
         });
 
         gsap.from("#current-video", {
@@ -60,15 +68,20 @@ function Hero() {
         });
       }
     },
-    { dependencies: [currentIndex], revertOnUpdate: true, scope: containerRef }
+    {
+      dependencies: [hasClicked],
+      revertOnUpdate: true,
+      scope: containerRef,
+    }
   );
 
   useGSAP(
     () => {
       gsap.set("#video-frame", {
-        clipPath: "polygon(14% 0, 72% 0, 88% 90%, 0 95%)",
+        clipPath: "polygon(14% 0%, 72% 0%, 88% 90%, 0% 95%)",
         borderRadius: "0% 0% 40% 10%",
       });
+
       gsap.from("#video-frame", {
         clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
         borderRadius: "0% 0% 0% 0%",
@@ -82,13 +95,14 @@ function Hero() {
       });
     },
     {
+      dependencies: [],
+      revertOnUpdate: true,
       scope: containerRef,
     }
   );
 
   return (
     <div ref={containerRef} className="relative h-dvh w-screen overflow-x-hidden">
-
       {isLoading && (
         <div className="flex-center absolute z-[100] h-dvh w-screen overflow-hidden bg-violet-50">
           <div className="three-body">
@@ -107,7 +121,7 @@ function Hero() {
           <div className="mask-clip-path absolute-center absolute z-50 size-64 overflow-hidden cursor-pointer rounded-lg">
             <div
               onClick={handleMiniVidClick}
-              className="origin-center scale-50 opacity-0 transition-all duration-500 ease-in hover:scale-100 hover:opacity-100"
+              className="origin-center scale-50 opacity-0 transition-all duration-500 ease-in-out hover:scale-100 hover:opacity-100"
             >
               <video
                 loop
@@ -116,29 +130,30 @@ function Hero() {
                 className="size-64 origin-center scale-150 object-cover object-center"
                 onLoadedData={handleVideoLoad}
                 src={getVideoSrc(upcomingVideoIndex)}
+                playsInline
               />
             </div>
           </div>
 
           <video
             ref={nextVideoRef}
-            src={getVideoSrc(currentIndex)}
+            src={getVideoSrc(upcomingVideoIndex)}
             loop
             muted
             id="next-video"
             className="absolute-center invisible absolute z-20 size-64 object-cover object-center"
             onLoadedData={handleVideoLoad}
+            playsInline
           />
 
           <video
-            src={getVideoSrc(
-              currentIndex === totalVideos ? 1 : currentIndex
-            )}
+            src={getVideoSrc(currentIndex)}
             autoPlay
             loop
             muted
             className="absolute left-0 top-0 size-full object-cover object-center"
             onLoadedData={handleVideoLoad}
+            playsInline
           />
         </div>
 
