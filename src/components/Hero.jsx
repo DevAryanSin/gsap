@@ -54,10 +54,10 @@ function Hero() {
           duration: 1,
           ease: "power1.inOut",
           onStart: () => nextVideoRef.current.play(),
-          // onComplete: () => {
-          //   setCurrentIndex(upcomingVideoIndex);
-          //   setHasClicked(false);
-          // },
+          onComplete: () => {
+            setCurrentIndex(upcomingVideoIndex);
+            setHasClicked(false);
+          },
         });
 
         gsap.from("#current-video", {
@@ -104,7 +104,7 @@ function Hero() {
   return (
     <div ref={containerRef} className="relative h-dvh w-screen overflow-x-hidden">
       {isLoading && (
-        <div className="flex-center absolute z-[100] h-dvh w-screen overflow-hidden bg-violet-50">
+        <div className="flex-center absolute z-100 h-dvh w-screen overflow-hidden bg-violet-50">
           <div className="three-body">
             <div className="three-body__dot"></div>
             <div className="three-body__dot"></div>
